@@ -6,14 +6,23 @@ namespace SpriteKind {
     export const mage = SpriteKind.create()
     export const warrior = SpriteKind.create()
     export const healer = SpriteKind.create()
+    export const move1 = SpriteKind.create()
+    export const move2 = SpriteKind.create()
+    export const move3 = SpriteKind.create()
+    export const move4 = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (place == list.length - 1) {
-        place = 0
+    if (move_set_open) {
+        placement2 = 0
+        tracker.setPosition(list3[place][0].x, list3[place][0].y)
     } else {
-        place += 1
+        if (place == 0) {
+            place = 2
+        } else {
+            place += -1
+        }
+        tracker.setPosition(_import[place].x, _import[place].y)
     }
-    tracker.setPosition(_import[place].x, _import[place].y)
 })
 sprites.onCreated(SpriteKind.bat, function (sprite) {
     statusbar = statusbars.create(20, 2, StatusBarKind.Health)
@@ -22,13 +31,279 @@ sprites.onCreated(SpriteKind.bat, function (sprite) {
     statusbar.attachToSprite(sprite)
 })
 function declaremovesets () {
-    healermoves = [0, 1]
-    magemoves = [0, 1]
-    warriormoves = [0, 1]
+    healermoves = [
+    sprites.create(img`
+        . . 2 2 b b b b b . . . . . . . 
+        . 2 b 4 4 4 4 4 4 b . . . . . . 
+        2 2 4 4 4 4 d d 4 4 b . . . . . 
+        2 b 4 4 4 4 4 4 d 4 b . . . . . 
+        2 b 4 4 4 4 4 4 4 d 4 b . . . . 
+        2 b 4 4 4 4 4 4 4 4 4 b . . . . 
+        2 b 4 4 4 4 4 4 4 4 4 e . . . . 
+        2 2 b 4 4 4 4 4 4 4 b e . . . . 
+        . 2 b b b 4 4 4 b b b e . . . . 
+        . . e b b b b b b b e e . . . . 
+        . . . e e b 4 4 b e e e b . . . 
+        . . . . . e e e e e e b d b b . 
+        . . . . . . . . . . . b 1 1 1 b 
+        . . . . . . . . . . . c 1 d d b 
+        . . . . . . . . . . . c 1 b c . 
+        . . . . . . . . . . . . c c . . 
+        `, SpriteKind.move1),
+    sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . b 5 5 5 b . . . . . 
+        . . . . . b b 5 5 5 b b . . . . 
+        . . b b b b 5 5 5 1 1 b b b b . 
+        . . b 5 5 5 5 5 5 1 1 5 5 5 b . 
+        . . b d d 5 5 5 5 5 5 5 d d b . 
+        . . . b d d 5 5 5 5 5 d d b . . 
+        . . . c b 5 5 5 5 5 5 5 b c . . 
+        . . . c b 5 5 5 5 5 5 5 b c . . 
+        . . . c 5 5 d d b d d 5 5 c . . 
+        . . . c 5 d d c c c d d 5 c . . 
+        . . . c c c c . . . c c c c . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.move2),
+    sprites.create(img`
+        . . . . . . . . 
+        . . . . . . . . 
+        . . . . . . . . 
+        . . . . . . . . 
+        . b b d d b b . 
+        b 1 1 3 3 1 1 b 
+        b 1 3 5 5 3 1 b 
+        b d 3 5 5 3 d b 
+        c 1 1 d d 1 1 c 
+        c d 1 d d 1 d c 
+        . c c 7 6 c c . 
+        . . 6 7 6 . . . 
+        . . 6 6 8 8 8 6 
+        . . 6 8 7 7 7 6 
+        . . 8 7 7 7 6 . 
+        . . 8 8 8 6 . . 
+        `, SpriteKind.move3),
+    sprites.create(img`
+        . . . . . b b b b b b . . . . . 
+        . . . b b 9 9 9 9 9 9 b b . . . 
+        . . b b 9 9 9 9 9 9 9 9 b b . . 
+        . b b 9 d 9 9 9 9 9 9 9 9 b b . 
+        . b 9 d 9 9 9 9 9 1 1 1 9 9 b . 
+        b 9 d d 9 9 9 9 9 1 1 1 9 9 9 b 
+        b 9 d 9 9 9 9 9 9 1 1 1 9 9 9 b 
+        b 9 3 9 9 9 9 9 9 9 9 9 1 9 9 b 
+        b 5 3 d 9 9 9 9 9 9 9 9 9 9 9 b 
+        b 5 3 3 9 9 9 9 9 9 9 9 9 d 9 b 
+        b 5 d 3 3 9 9 9 9 9 9 9 d d 9 b 
+        . b 5 3 3 3 d 9 9 9 9 d d 5 b . 
+        . b d 5 3 3 3 3 3 3 3 d 5 b b . 
+        . . b d 5 d 3 3 3 3 5 5 b b . . 
+        . . . b b 5 5 5 5 5 5 b b . . . 
+        . . . . . b b b b b b . . . . . 
+        `, SpriteKind.move4)
+    ]
+    magemoves = [
+    sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 3 1 3 . . . . . . 
+        . . . . . . 2 3 1 3 2 . . . . . 
+        . . . . . . 2 1 1 1 2 . . . . . 
+        . . . . . . 2 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 2 3 1 3 2 . . . . . 
+        . . . . . . . 2 2 2 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.move1),
+    sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . 4 . . . . . 
+        . . . . 2 . . . . 4 4 . . . . . 
+        . . . . 2 4 . . 4 5 4 . . . . . 
+        . . . . . 2 4 d 5 5 4 . . . . . 
+        . . . . . 2 5 5 5 5 4 . . . . . 
+        . . . . . . 2 5 5 5 5 4 . . . . 
+        . . . . . . 2 5 4 2 4 4 . . . . 
+        . . . . . . 4 4 . . 2 4 4 . . . 
+        . . . . . 4 4 . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.move2),
+    sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . b b . b b b . . . . . 
+        . . . . b 1 1 b 1 1 1 b . . . . 
+        . . b b 3 1 1 d d 1 d d b b . . 
+        . b 1 1 d d b b b b b 1 1 b . . 
+        . b 1 1 1 b . . . . . b d d b . 
+        . . 3 d d b . . . . . b d 1 1 b 
+        . b 1 d 3 . . . . . . . b 1 1 b 
+        . b 1 1 b . . . . . . b b 1 d b 
+        . b 1 d b . . . . . . b d 3 d b 
+        . b b d d b . . . . b d d d b . 
+        . b d d d d b . b b 3 d d 3 b . 
+        . . b d d 3 3 b d 3 3 b b b . . 
+        . . . b b b d d d d d b . . . . 
+        . . . . . . b b b b b . . . . . 
+        `, SpriteKind.move3),
+    sprites.create(img`
+        . . 6 7 7 8 . . 
+        . 6 7 7 8 . . . 
+        . 8 7 8 . . 6 8 
+        . 8 7 8 . 6 6 8 
+        . . 8 6 8 8 8 . 
+        . . . 8 6 8 . . 
+        6 6 . . 8 7 8 . 
+        8 6 6 8 7 7 8 . 
+        . 8 8 7 7 8 . . 
+        . 8 7 7 8 . . . 
+        . 8 7 8 . 8 6 . 
+        . 8 7 8 . 8 6 6 
+        . . 8 6 8 . 8 8 
+        . . . 8 6 8 . . 
+        . . . . 8 7 8 . 
+        . . . 6 7 7 8 . 
+        `, SpriteKind.move4)
+    ]
+    warriormoves = [
+    sprites.create(img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ......bbb...bbb.....
+        .....bdddb.bddcb....
+        ....bdddddbddbccb...
+        ....bdddddddbbccb...
+        ....bddddddbbcccb...
+        .....bddddbbcccb....
+        ......bbdbbcccb.....
+        .......bcccccb......
+        ........bcccb.......
+        .........bcb........
+        ..........b.........
+        ....................
+        ....................
+        ....................
+        ....................
+        `, SpriteKind.move1),
+    sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . . c d c . . . . . . 
+        . . . . . . . c 5 c . . . . . . 
+        . . . . . . c d 5 d c . . . . . 
+        . . . b c c d 5 5 5 d c c b . . 
+        . . b d d 5 5 5 5 5 5 5 d d b . 
+        . . . b c c d 5 5 5 d c c b . . 
+        . . . . . . c d 5 d c . . . . . 
+        . . . . . . . c 5 c . . . . . . 
+        . . . . . . . c d c . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.move2),
+    sprites.create(img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ........4eee........
+        .......eeeeee.......
+        .........cc.........
+        .........ec.........
+        ........eeee........
+        .......ee4eee.......
+        ......ee4eeeee......
+        .....ee4eeeeeee.....
+        .....eeeeeeeeee.....
+        .....eeeeeeeecc.....
+        ......eeeeeecc......
+        .......eccccc.......
+        ....................
+        ....................
+        `, SpriteKind.move3),
+    sprites.create(img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        .........888........
+        .........888........
+        ......888888888.....
+        ........fffff.......
+        .......8888888......
+        .......8998888......
+        .......8988888......
+        .......8888888......
+        .......8888888......
+        .......8888888......
+        ......888888888.....
+        ......fffffffff.....
+        ....................
+        ....................
+        `, SpriteKind.move4)
+    ]
+    for (let value of sprites.allOfKind(SpriteKind.move1)) {
+        value.setPosition(60, 40)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.move2)) {
+        value.setPosition(40, 60)
+    }
+    for (let value of sprites.allOfKind(SpriteKind.move3)) {
+        value.setPosition(60, 80)
+    }
+    for (let value of warriormoves) {
+        value.setFlag(SpriteFlag.Invisible, true)
+    }
+    for (let value of magemoves) {
+        value.setFlag(SpriteFlag.Invisible, true)
+    }
+    for (let value of healermoves) {
+        value.setFlag(SpriteFlag.Invisible, true)
+    }
+}
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    for (let value of list3[place]) {
+        value.setFlag(SpriteFlag.Invisible, true)
+        tracker.setPosition(_import[place].x, _import[place].y)
+        move_set_open = false
+    }
+})
+function domove (num: number) {
+	
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (_import == list) {
-    	
+    if (move_set_open) {
+        moveimagecopy = list3[place][placement2].image
+        figure_out_what_move_player_is_doing()
+    } else {
+        for (let value of list3[place]) {
+            value.setFlag(SpriteFlag.Invisible, false)
+            tracker.setPosition(value.x, value.y)
+            move_set_open = true
+        }
     }
 })
 function enemyspawning () {
@@ -36,9 +311,9 @@ function enemyspawning () {
     enemy1 = enemykind1[0]
     enemy2 = enemykind2[0]
     enemy3 = enemykind3[0]
-    enemy1.setPosition(20, 80)
+    enemy3.setPosition(20, 80)
     enemy2.setPosition(20, 60)
-    enemy3.setPosition(20, 40)
+    enemy1.setPosition(20, 40)
 }
 function advanceroom () {
     scroller.scrollBackgroundWithSpeed(50, 0)
@@ -234,8 +509,13 @@ function advanceroom () {
     }
 }
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    _import = list2
-    tracker.setPosition(list2[place].x, list2[place].y)
+    if (move_set_open) {
+        placement2 = 1
+        tracker.setPosition(list3[place][1].x, list3[place][1].y)
+    } else {
+        _import = list2
+        tracker.setPosition(list2[place].x, list2[place].y)
+    }
 })
 function declare_storage () {
     enemykind1 = [
@@ -495,33 +775,288 @@ function declare_storage () {
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    _import = list
-    tracker.setPosition(list[place].x, list[place].y)
-})
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (place == 0) {
-        place = 2
+    if (move_set_open) {
+        placement2 = 3
+        tracker.setPosition(list3[place][3].x, list3[place][3].y)
     } else {
-        place += -1
+        _import = list
+        tracker.setPosition(list[place].x, list[place].y)
     }
-    tracker.setPosition(_import[place].x, _import[place].y)
+})
+function figure_out_what_move_player_is_doing () {
+    list_of_images = [
+    img`
+        . . 2 2 b b b b b . . . . . . . 
+        . 2 b 4 4 4 4 4 4 b . . . . . . 
+        2 2 4 4 4 4 d d 4 4 b . . . . . 
+        2 b 4 4 4 4 4 4 d 4 b . . . . . 
+        2 b 4 4 4 4 4 4 4 d 4 b . . . . 
+        2 b 4 4 4 4 4 4 4 4 4 b . . . . 
+        2 b 4 4 4 4 4 4 4 4 4 e . . . . 
+        2 2 b 4 4 4 4 4 4 4 b e . . . . 
+        . 2 b b b 4 4 4 b b b e . . . . 
+        . . e b b b b b b b e e . . . . 
+        . . . e e b 4 4 b e e e b . . . 
+        . . . . . e e e e e e b d b b . 
+        . . . . . . . . . . . b 1 1 1 b 
+        . . . . . . . . . . . c 1 d d b 
+        . . . . . . . . . . . c 1 b c . 
+        . . . . . . . . . . . . c c . . 
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . b 5 5 5 b . . . . . 
+        . . . . . b b 5 5 5 b b . . . . 
+        . . b b b b 5 5 5 1 1 b b b b . 
+        . . b 5 5 5 5 5 5 1 1 5 5 5 b . 
+        . . b d d 5 5 5 5 5 5 5 d d b . 
+        . . . b d d 5 5 5 5 5 d d b . . 
+        . . . c b 5 5 5 5 5 5 5 b c . . 
+        . . . c b 5 5 5 5 5 5 5 b c . . 
+        . . . c 5 5 d d b d d 5 5 c . . 
+        . . . c 5 d d c c c d d 5 c . . 
+        . . . c c c c . . . c c c c . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,
+    img`
+        . . . . . . . . 
+        . . . . . . . . 
+        . . . . . . . . 
+        . . . . . . . . 
+        . b b d d b b . 
+        b 1 1 3 3 1 1 b 
+        b 1 3 5 5 3 1 b 
+        b d 3 5 5 3 d b 
+        c 1 1 d d 1 1 c 
+        c d 1 d d 1 d c 
+        . c c 7 6 c c . 
+        . . 6 7 6 . . . 
+        . . 6 6 8 8 8 6 
+        . . 6 8 7 7 7 6 
+        . . 8 7 7 7 6 . 
+        . . 8 8 8 6 . . 
+        `,
+    img`
+        . . . . . b b b b b b . . . . . 
+        . . . b b 9 9 9 9 9 9 b b . . . 
+        . . b b 9 9 9 9 9 9 9 9 b b . . 
+        . b b 9 d 9 9 9 9 9 9 9 9 b b . 
+        . b 9 d 9 9 9 9 9 1 1 1 9 9 b . 
+        b 9 d d 9 9 9 9 9 1 1 1 9 9 9 b 
+        b 9 d 9 9 9 9 9 9 1 1 1 9 9 9 b 
+        b 9 3 9 9 9 9 9 9 9 9 9 1 9 9 b 
+        b 5 3 d 9 9 9 9 9 9 9 9 9 9 9 b 
+        b 5 3 3 9 9 9 9 9 9 9 9 9 d 9 b 
+        b 5 d 3 3 9 9 9 9 9 9 9 d d 9 b 
+        . b 5 3 3 3 d 9 9 9 9 d d 5 b . 
+        . b d 5 3 3 3 3 3 3 3 d 5 b b . 
+        . . b d 5 d 3 3 3 3 5 5 b b . . 
+        . . . b b 5 5 5 5 5 5 b b . . . 
+        . . . . . b b b b b b . . . . . 
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 2 1 2 . . . . . . 
+        . . . . . . . 3 1 3 . . . . . . 
+        . . . . . . 2 3 1 3 2 . . . . . 
+        . . . . . . 2 1 1 1 2 . . . . . 
+        . . . . . . 2 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 3 1 1 1 3 . . . . . 
+        . . . . . . 2 3 1 3 2 . . . . . 
+        . . . . . . . 2 2 2 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . 4 . . . . . 
+        . . . . 2 . . . . 4 4 . . . . . 
+        . . . . 2 4 . . 4 5 4 . . . . . 
+        . . . . . 2 4 d 5 5 4 . . . . . 
+        . . . . . 2 5 5 5 5 4 . . . . . 
+        . . . . . . 2 5 5 5 5 4 . . . . 
+        . . . . . . 2 5 4 2 4 4 . . . . 
+        . . . . . . 4 4 . . 2 4 4 . . . 
+        . . . . . 4 4 . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . b b . b b b . . . . . 
+        . . . . b 1 1 b 1 1 1 b . . . . 
+        . . b b 3 1 1 d d 1 d d b b . . 
+        . b 1 1 d d b b b b b 1 1 b . . 
+        . b 1 1 1 b . . . . . b d d b . 
+        . . 3 d d b . . . . . b d 1 1 b 
+        . b 1 d 3 . . . . . . . b 1 1 b 
+        . b 1 1 b . . . . . . b b 1 d b 
+        . b 1 d b . . . . . . b d 3 d b 
+        . b b d d b . . . . b d d d b . 
+        . b d d d d b . b b 3 d d 3 b . 
+        . . b d d 3 3 b d 3 3 b b b . . 
+        . . . b b b d d d d d b . . . . 
+        . . . . . . b b b b b . . . . . 
+        `,
+    img`
+        . . 6 7 7 8 . . 
+        . 6 7 7 8 . . . 
+        . 8 7 8 . . 6 8 
+        . 8 7 8 . 6 6 8 
+        . . 8 6 8 8 8 . 
+        . . . 8 6 8 . . 
+        6 6 . . 8 7 8 . 
+        8 6 6 8 7 7 8 . 
+        . 8 8 7 7 8 . . 
+        . 8 7 7 8 . . . 
+        . 8 7 8 . 8 6 . 
+        . 8 7 8 . 8 6 6 
+        . . 8 6 8 . 8 8 
+        . . . 8 6 8 . . 
+        . . . . 8 7 8 . 
+        . . . 6 7 7 8 . 
+        `,
+    img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ......bbb...bbb.....
+        .....bdddb.bddcb....
+        ....bdddddbddbccb...
+        ....bdddddddbbccb...
+        ....bddddddbbcccb...
+        .....bddddbbcccb....
+        ......bbdbbcccb.....
+        .......bcccccb......
+        ........bcccb.......
+        .........bcb........
+        ..........b.........
+        ....................
+        ....................
+        ....................
+        ....................
+        `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . . c d c . . . . . . 
+        . . . . . . . c 5 c . . . . . . 
+        . . . . . . c d 5 d c . . . . . 
+        . . . b c c d 5 5 5 d c c b . . 
+        . . b d d 5 5 5 5 5 5 5 d d b . 
+        . . . b c c d 5 5 5 d c c b . . 
+        . . . . . . c d 5 d c . . . . . 
+        . . . . . . . c 5 c . . . . . . 
+        . . . . . . . c d c . . . . . . 
+        . . . . . . . b d b . . . . . . 
+        . . . . . . . . b . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `,
+    img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ........4eee........
+        .......eeeeee.......
+        .........cc.........
+        .........ec.........
+        ........eeee........
+        .......ee4eee.......
+        ......ee4eeeee......
+        .....ee4eeeeeee.....
+        .....eeeeeeeeee.....
+        .....eeeeeeeecc.....
+        ......eeeeeecc......
+        .......eccccc.......
+        ....................
+        ....................
+        `,
+    img`
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        ....................
+        .........888........
+        .........888........
+        ......888888888.....
+        ........fffff.......
+        .......8888888......
+        .......8998888......
+        .......8988888......
+        .......8888888......
+        .......8888888......
+        .......8888888......
+        ......888888888.....
+        ......fffffffff.....
+        ....................
+        ....................
+        `
+    ]
+    counter = 0
+    for (let value of list_of_images) {
+        if (moveimagecopy.equals(list_of_images[counter])) {
+            domove(counter)
+        }
+        counter += 1
+    }
+}
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (move_set_open) {
+        placement2 = 2
+        tracker.setPosition(list3[place][2].x, list3[place][2].y)
+    } else {
+        if (place == list.length - 1) {
+            place = 0
+        } else {
+            place += 1
+        }
+        tracker.setPosition(_import[place].x, _import[place].y)
+    }
 })
 function moveup (list: any[]) {
 	
 }
+let counter = 0
+let list_of_images: Image[] = []
 let enemykind3: Sprite[] = []
 let enemykind2: Sprite[] = []
 let enemykind1: Sprite[] = []
+let moveimagecopy: Image = null
 let statusbar: StatusBarSprite = null
+let placement2 = 0
+let move_set_open = false
 let _import: Sprite[] = []
 let enemy3: Sprite = null
 let enemy2: Sprite = null
 let enemy1: Sprite = null
 let list2: Sprite[] = []
 let place = 0
-let warriormoves: number[] = []
-let magemoves: number[] = []
-let healermoves: number[] = []
+let warriormoves: Sprite[] = []
+let magemoves: Sprite[] = []
+let healermoves: Sprite[] = []
+let list3: Sprite[][] = []
 let list: Sprite[] = []
 let room_empty = false
 let mage: Sprite = null
@@ -606,7 +1141,8 @@ warrior.setPosition(100, 80)
 tracker.setPosition(100, 40)
 room_empty = true
 list = [healer, mage, warrior]
-let list3 = [healermoves, magemoves, warriormoves]
+declaremovesets()
+list3 = [healermoves, magemoves, warriormoves]
 animation.runImageAnimation(
 tracker,
 [img`
@@ -684,3 +1220,4 @@ true
 place = 0
 enemyspawning()
 list2 = [enemy1, enemy2, enemy3]
+_import = list
