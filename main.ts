@@ -18,12 +18,15 @@ namespace StatusBarKind {
 }
 statusbars.onStatusReached(StatusBarKind.EnemyHealth, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
     enemy1.setPosition(-60, 0)
-    enemy1 = enemykind1[randint(0, 3)]
+    list2.removeAt(0)
+    picked_value = randint(0, 3)
+    enemy1 = enemykind1[picked_value]
     enemy1.setPosition(20, 40)
+    list2[0] = enemy1
     enemykindinquestion = enemy1
     sethealth(enemy1)
-    statusbar = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
     statusbar.max = enemyspecs[1]
+    statusbar.value = enemyspecs[2]
     statusbar.attachToSprite(enemykindinquestion)
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -311,13 +314,14 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 function domove (num: number) {
     what_move_player_is_doing = num
-    if (num == 2) {
+    if (num == 1) {
         move_being_made = true
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (move_being_made) {
         run_attack_code_for_whatever_the_hell_the_player_is_doing(what_move_player_is_doing, list2[place])
+        move_being_made = false
     } else {
         if (move_set_open) {
             moveimagecopy = list3[place][placement2].image
@@ -358,9 +362,6 @@ function enemyspawning () {
     statusbar3.value = enemyspecs[2]
     statusbar3.attachToSprite(enemykindinquestion)
 }
-controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
-	
-})
 function advanceroom () {
     scroller.scrollBackgroundWithSpeed(50, 0)
     if (room_empty) {
@@ -555,12 +556,16 @@ function advanceroom () {
     }
 }
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (move_set_open) {
-        placement2 = 1
-        tracker.setPosition(list3[place][1].x, list3[place][1].y)
+    if (move_being_made) {
+    	
     } else {
-        _import = list2
-        tracker.setPosition(list2[place].x, list2[place].y)
+        if (move_set_open) {
+            placement2 = 1
+            tracker.setPosition(list3[place][1].x, list3[place][1].y)
+        } else {
+            _import = list2
+            tracker.setPosition(list2[place].x, list2[place].y)
+        }
     }
 })
 function declare_storage () {
@@ -826,9 +831,24 @@ sprites.onCreated(SpriteKind.warrior, function (sprite) {
     warriorhealth.value = 120
     warriorhealth.attachToSprite(sprite)
 })
+function who_got_hit (num: number) {
+    if (num == 1) {
+        if (list2[place] == enemy1) {
+            statusbar.value += -12
+        }
+        if (list2[place] == enemy2) {
+            statusbar2.value += -12
+        }
+        if (list2[place] == enemy3) {
+            statusbar3.value += -12
+        }
+    }
+}
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
-    if (num == 2) {
+    if (num == 1) {
+        tracker.setPosition(list2[place].x, list2[place].y)
         for (let index = 0; index < 4; index++) {
+            pause(200)
             mySprite = sprites.create(img`
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . b . . . . . . . 
@@ -847,17 +867,22 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . . . . . . . . . 
                 `, SpriteKind.player_to_enemy_projectile)
+            mySprite.setPosition(100, 4)
             mySprite.follow(sprite)
         }
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (move_set_open) {
-        placement2 = 3
-        tracker.setPosition(list3[place][3].x, list3[place][3].y)
+    if (move_being_made) {
+    	
     } else {
-        _import = list
-        tracker.setPosition(list[place].x, list[place].y)
+        if (move_set_open) {
+            placement2 = 3
+            tracker.setPosition(list3[place][3].x, list3[place][3].y)
+        } else {
+            _import = list
+            tracker.setPosition(list[place].x, list[place].y)
+        }
     }
 })
 sprites.onCreated(SpriteKind.healer, function (sprite) {
@@ -1112,6 +1137,7 @@ function figure_out_what_move_player_is_doing () {
     placement2 = 3
 }
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.ghost, function (sprite, otherSprite) {
+    who_got_hit(what_move_player_is_doing)
     sprite.destroy()
 })
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -1137,6 +1163,7 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.snake, function (sprite, otherSprite) {
+    who_got_hit(what_move_player_is_doing)
     sprite.destroy()
 })
 sprites.onCreated(SpriteKind.mage, function (sprite) {
@@ -1144,6 +1171,21 @@ sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth.max = 80
     magehealth.value = 80
     magehealth.attachToSprite(sprite)
+})
+statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
+    enemy2.setPosition(-60, 0)
+    list2.removeAt(1)
+    picked_value = randint(0, 3)
+    enemy2 = enemykind2[picked_value]
+    enemy2.setPosition(20, 40)
+    list2[0] = enemy1
+    list2[1] = enemy2
+    list2[2] = enemy3
+    enemykindinquestion = enemy2
+    sethealth(enemy2)
+    statusbar.max = enemyspecs[1]
+    statusbar.value = enemyspecs[2]
+    statusbar.attachToSprite(enemykindinquestion)
 })
 function sethealth (sprite: Sprite) {
     if (enemykindinquestion == enemykind1[0]) {
@@ -1157,9 +1199,11 @@ function sethealth (sprite: Sprite) {
     }
 }
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.mini_kaiju, function (sprite, otherSprite) {
+    who_got_hit(what_move_player_is_doing)
     sprite.destroy()
 })
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.bat, function (sprite, otherSprite) {
+    who_got_hit(what_move_player_is_doing)
     sprite.destroy()
 })
 let magehealth: StatusBarSprite = null
@@ -1180,6 +1224,7 @@ let enemyspecs: number[] = []
 let statusbar: StatusBarSprite = null
 let enemykindinquestion: Sprite = null
 let enemykind1: Sprite[] = []
+let picked_value = 0
 let placement2 = 0
 let _import: Sprite[] = []
 let enemy3: Sprite = null
