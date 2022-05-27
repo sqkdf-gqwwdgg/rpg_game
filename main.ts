@@ -950,7 +950,12 @@ function who_got_hit (num: number) {
     }
 }
 statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
-	
+    enemy3.setImage(enemykind3[randint(0, 2)])
+    sethealth(enemy3)
+    statusbar3 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+    statusbar3.max = enemyspecs[1]
+    statusbar3.value = enemyspecs[2]
+    statusbar3.attachToSprite(enemy3)
 })
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
     if (num == 1) {
@@ -1280,9 +1285,6 @@ sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth.value = 80
     magehealth.attachToSprite(sprite)
 })
-statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
-	
-})
 function sethealth (sprite: Sprite) {
     if (sprite.image == enemykind1[0]) {
         enemyspecs = [20, 25, 25]
@@ -1297,6 +1299,14 @@ function sethealth (sprite: Sprite) {
 function do_enemy_attack () {
     which_enemy_attacking = list[randint(0, 2)]
 }
+statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Percentage, 0, function (status) {
+    enemy2.setImage(enemykind2[randint(0, 2)])
+    sethealth(enemy2)
+    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+    statusbar2.max = enemyspecs[1]
+    statusbar2.value = enemyspecs[2]
+    statusbar2.attachToSprite(enemy2)
+})
 let which_enemy_attacking: Sprite = null
 let magehealth: StatusBarSprite = null
 let counter = 0
