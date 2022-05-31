@@ -55,6 +55,7 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     who_got_hit(what_move_player_is_doing)
     sprite.destroy()
+    crits.value += 2
 })
 function declaremovesets () {
     healermoves = [
@@ -572,6 +573,34 @@ function advanceroom () {
         )
     }
 }
+function attack4 (num: number) {
+    if (num == 4) {
+        if (list2[place] == enemy1) {
+            if (status20 > 0) {
+                statusbar.value += -125
+            } else {
+                statusbar.value += -75
+            }
+            status00 += 2
+        }
+        if (list2[place] == enemy2) {
+            if (status21 > 0) {
+                statusbar2.value += -125
+            } else {
+                statusbar2.value += -75
+            }
+            status10 += 2
+        }
+        if (list2[place] == enemy3) {
+            if (status22 > 0) {
+                statusbar3.value += -125
+            } else {
+                statusbar3.value += -75
+            }
+            status20 += 2
+        }
+    }
+}
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     if (move_being_made) {
     	
@@ -593,8 +622,6 @@ function declare_storage () {
     let status11 = 0
     let status01 = 0
     let status30 = 0
-    let status10 = 0
-    let status00 = 0
     enemykind1 = [
     img`
         f f f . . . . . . . . f f f . . 
@@ -981,15 +1008,29 @@ sprites.onCreated(SpriteKind.warrior, function (sprite) {
 function who_got_hit (num: number) {
     if (num == 1) {
         if (list2[place] == enemy1) {
-            statusbar.value += -12
+            if (status20 > 0) {
+                statusbar.value += -36
+            } else {
+                statusbar.value += -12
+            }
         }
         if (list2[place] == enemy2) {
-            statusbar2.value += -12
+            if (status21 > 0) {
+                statusbar2.value += -36
+            } else {
+                statusbar2.value += -12
+            }
         }
         if (list2[place] == enemy3) {
-            statusbar3.value += -12
+            if (status22 > 0) {
+                statusbar3.value += -36
+            } else {
+                statusbar3.value += -12
+            }
         }
+        crits.value += 3
     }
+    attack4(num)
 }
 statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
     enemy3.setImage(enemykind3[randint(0, 2)])
@@ -1002,9 +1043,9 @@ statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparis
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
     if (num == 0) {
         healer.startEffect(effects.hearts, 1000)
-        warriorhealth.value += 15
-        magehealth.value += 15
-        healerhealth.value += 15
+        warriorhealth.value += 30
+        magehealth.value += 30
+        healerhealth.value += 20
     }
     if (num == 1) {
         tracker.setPosition(list2[place].x, list2[place].y)
@@ -1034,6 +1075,9 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
     }
     if (num == 2) {
         tracker.setPosition(list2[place].x, list2[place].y)
+        status20 += 3
+        status21 += 3
+        status22 += 3
         for (let index = 0; index < 9; index++) {
             pause(200)
             flowerdmgincrease += 0.5
@@ -1067,15 +1111,30 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
             }
         }
     }
+    if (num == 4) {
+        tracker.setPosition(list2[place].x, list2[place].y)
+        flowerthingy = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . 4 4 . . . . . . . 
+            . . . . . . 4 5 5 4 . . . . . . 
+            . . . . . . 2 5 5 2 . . . . . . 
+            . . . . . . . 2 2 . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.player_to_enemy_projectile)
+        flowerthingy.follow(sprite)
+        flowerthingy.setPosition(100, 60)
+    }
 }
-statusbars.onZero(StatusBarKind.Health, function (status) {
-    enemy2.setImage(enemykind2[randint(0, 2)])
-    sethealth(enemy2)
-    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
-    statusbar2.max = enemyspecs[1]
-    statusbar2.value = enemyspecs[2]
-    statusbar2.attachToSprite(enemy2)
-})
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (move_being_made) {
     	
@@ -1363,34 +1422,37 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (otherSprite == statusbar.spriteAttachedTo()) {
-        if (status20 > 0) {
-            statusbar.value += -4
-        } else {
-            statusbar.value += -2
-            status20 += 3
+    if (what_move_player_is_doing == 2) {
+        crits.value += 1
+        if (otherSprite == statusbar.spriteAttachedTo()) {
+            if (status20 > 0) {
+                statusbar.value += -10
+            } else {
+                statusbar.value += -5
+            }
         }
-    }
-    if (otherSprite == statusbar2.spriteAttachedTo()) {
-        if (status21 > 0) {
-            statusbar2.value += -4
-        } else {
-            statusbar2.value += -2
-            status21 += 3
+        if (otherSprite == statusbar2.spriteAttachedTo()) {
+            if (status21 > 0) {
+                statusbar2.value += -10
+            } else {
+                statusbar2.value += -5
+            }
         }
-    }
-    if (otherSprite == statusbar3.spriteAttachedTo()) {
-        if (status22 > 0) {
-            statusbar3.value += -4
-        } else {
-            statusbar3.value += -2
-            status22 += 3
+        if (otherSprite == statusbar3.spriteAttachedTo()) {
+            if (status22 > 0) {
+                statusbar3.value += -10
+            } else {
+                statusbar3.value += -10
+            }
         }
+        sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
+        pause(500)
+        sprite.startEffect(effects.fire, 500)
+        sprite.destroy()
     }
-    sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
-    pause(500)
-    sprite.startEffect(effects.fire, 500)
-    sprite.destroy()
+    if (what_move_player_is_doing == 4) {
+    	
+    }
 })
 sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth = statusbars.create(20, 2, StatusBarKind.Health)
@@ -1398,15 +1460,23 @@ sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth.value = 80
     magehealth.attachToSprite(sprite)
 })
+statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
+    enemy2.setImage(enemykind2[randint(0, 2)])
+    sethealth(enemy2)
+    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+    statusbar2.max = enemyspecs[1]
+    statusbar2.value = enemyspecs[2]
+    statusbar2.attachToSprite(enemy2)
+})
 function sethealth (sprite: Sprite) {
     if (sprite.image == enemykind1[0]) {
-        enemyspecs = [20, 25, 25]
+        enemyspecs = [20, 225, 225]
     } else if (sprite.image == enemykind1[1]) {
-        enemyspecs = [20, 40, 40]
+        enemyspecs = [20, 400, 400]
     } else if (sprite.image == enemykind1[2]) {
-        enemyspecs = [20, 30, 30]
+        enemyspecs = [20, 330, 330]
     } else if (sprite.image == enemykind1[3]) {
-        enemyspecs = [20, 60, 60]
+        enemyspecs = [20, 600, 600]
     }
 }
 function enemymoves () {
@@ -1421,13 +1491,13 @@ function do_enemy_attack () {
 }
 function turn_ended () {
     if (enemy1statuses[0] > 0) {
-        statusbar.value += -5
+        statusbar.value += -25
     }
     if (enemy2statuses[0] > 0) {
-        statusbar2.value += -5
+        statusbar2.value += -25
     }
     if (enemy3statuses[0] > 0) {
-        statusbar3.value += -5
+        statusbar3.value += -25
     }
     for (let value of enemy1statuses) {
         if (!(value == 0)) {
@@ -1454,16 +1524,18 @@ let healerhealth: StatusBarSprite = null
 let magehealth: StatusBarSprite = null
 let warriorhealth: StatusBarSprite = null
 let literally_just_for_me_to_keep_track_of_statuses = 0
-let status22 = 0
 let enemy3statuses: number[] = []
-let status21 = 0
 let enemy2statuses: number[] = []
-let status20 = 0
 let enemy1statuses: number[] = []
 let ghostmoves: number[] = []
 let snakemoves: number[] = []
 let kaijumoves: number[] = []
 let batmoves: number[] = []
+let status22 = 0
+let status10 = 0
+let status21 = 0
+let status00 = 0
+let status20 = 0
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
 let placeholder1: Image[] = []
@@ -1475,6 +1547,7 @@ let move_being_made = false
 let enemymove = false
 let enemyspecs: number[] = []
 let enemykind1: Image[] = []
+let crits: StatusBarSprite = null
 let statusbar2: StatusBarSprite = null
 let statusbar3: StatusBarSprite = null
 let statusbar: StatusBarSprite = null
@@ -1656,3 +1729,7 @@ _import = list
 placement2 = 3
 let list_of_player_hp_bars = [statusbar, statusbar3, statusbar2]
 let flowerdmgincrease = 1
+crits = statusbars.create(60, 4, StatusBarKind.Magic)
+crits.value = 0
+crits.max = 250
+crits.setPosition(75, 4)
