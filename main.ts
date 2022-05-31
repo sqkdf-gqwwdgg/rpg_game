@@ -587,15 +587,12 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 function declare_storage () {
     let status32 = 0
-    let status22 = 0
     let status12 = 0
     let status02 = 0
     let status31 = 0
-    let status21 = 0
     let status11 = 0
     let status01 = 0
     let status30 = 0
-    let status20 = 0
     let status10 = 0
     let status00 = 0
     enemykind1 = [
@@ -1367,13 +1364,28 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite, otherSprite) {
     if (otherSprite == statusbar.spriteAttachedTo()) {
-        statusbar.value += -2
+        if (status20 > 0) {
+            statusbar.value += -4
+        } else {
+            statusbar.value += -2
+            status20 += 3
+        }
     }
     if (otherSprite == statusbar2.spriteAttachedTo()) {
-        statusbar2.value += -2
+        if (status21 > 0) {
+            statusbar2.value += -4
+        } else {
+            statusbar2.value += -2
+            status21 += 3
+        }
     }
     if (otherSprite == statusbar3.spriteAttachedTo()) {
-        statusbar3.value += -2
+        if (status22 > 0) {
+            statusbar3.value += -4
+        } else {
+            statusbar3.value += -2
+            status22 += 3
+        }
     }
     sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
     pause(500)
@@ -1442,8 +1454,11 @@ let healerhealth: StatusBarSprite = null
 let magehealth: StatusBarSprite = null
 let warriorhealth: StatusBarSprite = null
 let literally_just_for_me_to_keep_track_of_statuses = 0
+let status22 = 0
 let enemy3statuses: number[] = []
+let status21 = 0
 let enemy2statuses: number[] = []
+let status20 = 0
 let enemy1statuses: number[] = []
 let ghostmoves: number[] = []
 let snakemoves: number[] = []
