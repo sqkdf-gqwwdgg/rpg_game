@@ -12,6 +12,7 @@ namespace SpriteKind {
     export const move4 = SpriteKind.create()
     export const player_to_enemy_projectile = SpriteKind.create()
     export const bob = SpriteKind.create()
+    export const from_the_ground = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const enemyhealth2 = StatusBarKind.create()
@@ -322,7 +323,13 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 function domove (num: number) {
     what_move_player_is_doing = num
+    if (num == 0) {
+        move_being_made = true
+    }
     if (num == 1) {
+        move_being_made = true
+    }
+    if (num == 2) {
         move_being_made = true
     }
 }
@@ -566,23 +573,31 @@ function advanceroom () {
     }
 }
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (enemymove) {
+    if (move_being_made) {
     	
     } else {
-        if (move_being_made) {
-        	
+        if (move_set_open) {
+            placement2 = 1
+            tracker.setPosition(list3[place][1].x, list3[place][1].y)
         } else {
-            if (move_set_open) {
-                placement2 = 1
-                tracker.setPosition(list3[place][1].x, list3[place][1].y)
-            } else {
-                _import = list2
-                tracker.setPosition(list2[place].x, list2[place].y)
-            }
+            _import = list2
+            tracker.setPosition(list2[place].x, list2[place].y)
         }
     }
 })
 function declare_storage () {
+    let status32 = 0
+    let status22 = 0
+    let status12 = 0
+    let status02 = 0
+    let status31 = 0
+    let status21 = 0
+    let status11 = 0
+    let status01 = 0
+    let status30 = 0
+    let status20 = 0
+    let status10 = 0
+    let status00 = 0
     enemykind1 = [
     img`
         f f f . . . . . . . . f f f . . 
@@ -929,6 +944,36 @@ function declare_storage () {
         . . . . . . . . . . . . . . . . 
         `
     ]
+    batmoves = [0, 1]
+    kaijumoves = [0, 1]
+    snakemoves = [0, 1]
+    ghostmoves = [0, 1]
+    enemy1statuses = [
+    status00,
+    status10,
+    status20,
+    status30
+    ]
+    enemy2statuses = [
+    status01,
+    status11,
+    status21,
+    status31
+    ]
+    enemy3statuses = [
+    status02,
+    status12,
+    status22,
+    status32
+    ]
+    // fire 1st enemy status
+    // just does damage over time
+    // deaf 2nd status 
+    // just disallows attack
+    // marked for death 3rd status just increases damage done to enemy
+    // weakened 4th enemy status
+    // does less damage
+    literally_just_for_me_to_keep_track_of_statuses = 0
 }
 sprites.onCreated(SpriteKind.warrior, function (sprite) {
     warriorhealth = statusbars.create(20, 2, StatusBarKind.Health)
@@ -958,11 +1003,17 @@ statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparis
     statusbar3.attachToSprite(enemy3)
 })
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
+    if (num == 0) {
+        healer.startEffect(effects.hearts, 1000)
+        warriorhealth.value += 15
+        magehealth.value += 15
+        healerhealth.value += 15
+    }
     if (num == 1) {
         tracker.setPosition(list2[place].x, list2[place].y)
         for (let index = 0; index < 4; index++) {
             pause(200)
-            mySprite = sprites.create(img`
+            flowerthingy = sprites.create(img`
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . b . . . . . . . 
                 . . . . . . . b d b . . . . . . 
@@ -980,25 +1031,64 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . . . . . . . . . 
                 `, SpriteKind.player_to_enemy_projectile)
-            mySprite.setPosition(100, 4)
-            mySprite.follow(sprite)
+            flowerthingy.setPosition(100, 4)
+            flowerthingy.follow(sprite)
+        }
+    }
+    if (num == 2) {
+        tracker.setPosition(list2[place].x, list2[place].y)
+        for (let index = 0; index < 9; index++) {
+            pause(200)
+            flowerdmgincrease += 0.5
+            flowerthingy = sprites.create(img`
+                . . . . . . . . 
+                . . . . . . . . 
+                . . . . . . . . 
+                . . . . . . . . 
+                . b b d d b b . 
+                b 1 1 3 3 1 1 b 
+                b 1 3 5 5 3 1 b 
+                b d 3 5 5 3 d b 
+                c 1 1 d d 1 1 c 
+                c d 1 d d 1 d c 
+                . c c 7 6 c c . 
+                . . 6 7 6 . . . 
+                . . 6 6 8 8 8 6 
+                . . 6 8 7 7 7 6 
+                . . 8 7 7 7 6 . 
+                . . 8 8 8 6 . . 
+                `, SpriteKind.from_the_ground)
+            randomnum = randint(1, 3)
+            if (randomnum == 1) {
+                flowerthingy.setPosition(20, 40)
+            }
+            if (randomnum == 2) {
+                flowerthingy.setPosition(20, 60)
+            }
+            if (randomnum == 3) {
+                flowerthingy.setPosition(20, 80)
+            }
         }
     }
 }
+statusbars.onZero(StatusBarKind.Health, function (status) {
+    enemy2.setImage(enemykind2[randint(0, 2)])
+    sethealth(enemy2)
+    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+    statusbar2.max = enemyspecs[1]
+    statusbar2.value = enemyspecs[2]
+    statusbar2.attachToSprite(enemy2)
+})
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (enemymove) {
+    if (move_being_made) {
     	
     } else {
-        if (move_being_made) {
-        	
+        if (move_set_open) {
+            placement2 = 3
+            tracker.setPosition(list3[place][3].x, list3[place][3].y)
         } else {
-            if (move_set_open) {
-                placement2 = 3
-                tracker.setPosition(list3[place][3].x, list3[place][3].y)
-            } else {
-                _import = list
-                tracker.setPosition(list[place].x, list[place].y)
-            }
+            _import = list
+            tracker.setPosition(list[place].x, list[place].y)
         }
     }
 })
@@ -1254,30 +1344,41 @@ function figure_out_what_move_player_is_doing () {
     placement2 = 3
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (enemymove) {
-    	
+    if (move_being_made) {
+        if (place == list2.length - 1) {
+            place = 0
+        } else {
+            place += 1
+        }
+        tracker.setPosition(list2[place].x, list2[place].y)
     } else {
-        if (move_being_made) {
-            if (place == list2.length - 1) {
+        if (move_set_open) {
+            placement2 = 2
+            tracker.setPosition(list3[place][2].x, list3[place][2].y)
+        } else {
+            if (place == list.length - 1) {
                 place = 0
             } else {
                 place += 1
             }
-            tracker.setPosition(list2[place].x, list2[place].y)
-        } else {
-            if (move_set_open) {
-                placement2 = 2
-                tracker.setPosition(list3[place][2].x, list3[place][2].y)
-            } else {
-                if (place == list.length - 1) {
-                    place = 0
-                } else {
-                    place += 1
-                }
-                tracker.setPosition(_import[place].x, _import[place].y)
-            }
+            tracker.setPosition(_import[place].x, _import[place].y)
         }
     }
+})
+sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite, otherSprite) {
+    if (otherSprite == statusbar.spriteAttachedTo()) {
+        statusbar.value += -2
+    }
+    if (otherSprite == statusbar2.spriteAttachedTo()) {
+        statusbar2.value += -2
+    }
+    if (otherSprite == statusbar3.spriteAttachedTo()) {
+        statusbar3.value += -2
+    }
+    sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
+    pause(500)
+    sprite.startEffect(effects.fire, 500)
+    sprite.destroy()
 })
 sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth = statusbars.create(20, 2, StatusBarKind.Health)
@@ -1296,24 +1397,58 @@ function sethealth (sprite: Sprite) {
         enemyspecs = [20, 60, 60]
     }
 }
+function enemymoves () {
+    enemymove = true
+    enemy1.sayText("enemies currently cant attack, so this is a placeholder", 2000, false)
+    pause(2000)
+    enemymove = false
+    turn_ended()
+}
 function do_enemy_attack () {
     which_enemy_attacking = list[randint(0, 2)]
 }
-statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Percentage, 0, function (status) {
-    enemy2.setImage(enemykind2[randint(0, 2)])
-    sethealth(enemy2)
-    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
-    statusbar2.max = enemyspecs[1]
-    statusbar2.value = enemyspecs[2]
-    statusbar2.attachToSprite(enemy2)
-})
+function turn_ended () {
+    if (enemy1statuses[0] > 0) {
+        statusbar.value += -5
+    }
+    if (enemy2statuses[0] > 0) {
+        statusbar2.value += -5
+    }
+    if (enemy3statuses[0] > 0) {
+        statusbar3.value += -5
+    }
+    for (let value of enemy1statuses) {
+        if (!(value == 0)) {
+            value += -1
+        }
+    }
+    for (let value of enemy1statuses) {
+        if (!(value == 0)) {
+            value += -1
+        }
+    }
+    for (let value of enemy1statuses) {
+        if (!(value == 0)) {
+            value += -1
+        }
+    }
+}
 let which_enemy_attacking: Sprite = null
-let magehealth: StatusBarSprite = null
 let counter = 0
 let list_of_images: Image[] = []
+let randomnum = 0
+let flowerthingy: Sprite = null
 let healerhealth: StatusBarSprite = null
-let mySprite: Sprite = null
+let magehealth: StatusBarSprite = null
 let warriorhealth: StatusBarSprite = null
+let literally_just_for_me_to_keep_track_of_statuses = 0
+let enemy3statuses: number[] = []
+let enemy2statuses: number[] = []
+let enemy1statuses: number[] = []
+let ghostmoves: number[] = []
+let snakemoves: number[] = []
+let kaijumoves: number[] = []
+let batmoves: number[] = []
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
 let placeholder1: Image[] = []
@@ -1322,7 +1457,7 @@ let moveimagecopy: Image = null
 let what_move_player_is_doing = 0
 let move_set_open = false
 let move_being_made = false
-let enemymove = 0
+let enemymove = false
 let enemyspecs: number[] = []
 let enemykind1: Image[] = []
 let statusbar2: StatusBarSprite = null
@@ -1505,3 +1640,4 @@ list2 = [enemy1, enemy2, enemy3]
 _import = list
 placement2 = 3
 let list_of_player_hp_bars = [statusbar, statusbar3, statusbar2]
+let flowerdmgincrease = 1
