@@ -52,6 +52,29 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+function damage_enemy2 (normalnum: number, critnum: number, enemy: Sprite) {
+    if (enemy == statusbar.spriteAttachedTo()) {
+        if (status20 > 0) {
+            statusbar.value += critnum
+        } else {
+            statusbar.value += normalnum
+        }
+    }
+    if (enemy == statusbar2.spriteAttachedTo()) {
+        if (status21 > 0) {
+            statusbar2.value += critnum
+        } else {
+            statusbar2.value += normalnum
+        }
+    }
+    if (enemy == statusbar3.spriteAttachedTo()) {
+        if (status22 > 0) {
+            statusbar3.value += critnum
+        } else {
+            statusbar3.value += normalnum
+        }
+    }
+}
 sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     who_got_hit(what_move_player_is_doing)
     sprite.destroy()
@@ -60,11 +83,10 @@ sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.Enemy, funct
 function set_enemy_statuses () {
     let status32 = 0
     let status12 = 0
-    let status02 = 0
     let status31 = 0
     let status11 = 0
-    let status01 = 0
     let status30 = 0
+    let status10 = 0
     enemy1statuses = [
     status00,
     status10,
@@ -89,7 +111,7 @@ function set_enemy_statuses () {
     // just disallows attack
     // marked for death 3rd status just increases damage done to enemy
     // weakened 4th enemy status
-    // does less damage
+    // does less damagesasawsawdsawdss
     literally_just_for_me_to_keep_track_of_statuses = 0
 }
 function declaremovesets () {
@@ -634,18 +656,6 @@ function advanceroom () {
         )
     }
 }
-function attack4 (num: number) {
-    if (num == 5) {
-        damage_enemy(-75, -125)
-        if (list2[place] == enemy1) {
-            status00 += 2
-        } else if (list2[place] == enemy2) {
-            status10 += 2
-        } else {
-            status20 += 2
-        }
-    }
-}
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     if (move_being_made) {
     	
@@ -1019,30 +1029,19 @@ sprites.onCreated(SpriteKind.warrior, function (sprite) {
 })
 function who_got_hit (num: number) {
     if (num == 1) {
-        if (list2[place] == enemy1) {
-            if (status20 > 0) {
-                statusbar.value += -36
-            } else {
-                statusbar.value += -12
-            }
-        }
-        if (list2[place] == enemy2) {
-            if (status21 > 0) {
-                statusbar2.value += -36
-            } else {
-                statusbar2.value += -12
-            }
-        }
-        if (list2[place] == enemy3) {
-            if (status22 > 0) {
-                statusbar3.value += -36
-            } else {
-                statusbar3.value += -12
-            }
-        }
+        damage_enemy(-12, -36)
         crits.value += 3
     }
-    attack4(num)
+    if (num == 5) {
+        damage_enemy(-75, -125)
+        if (list2[place] == enemy1) {
+            status00 += 2
+        } else if (list2[place] == enemy2) {
+            status01 += 2
+        } else {
+            status02 += 2
+        }
+    }
     enemymoves()
 }
 statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
@@ -1636,7 +1635,7 @@ function damage_enemy (normalnum: number, critnum: number) {
         if (status21 > 0) {
             statusbar2.value += critnum
         } else {
-            statusbar3.value += normalnum
+            statusbar2.value += normalnum
         }
     }
     if (list2[place] == enemy3) {
@@ -1694,15 +1693,16 @@ let placeholder1: Image[] = []
 let placeholdersprite: Sprite = null
 let moveimagecopy: Image = null
 let literally_just_for_me_to_keep_track_of_statuses = 0
-let status22 = 0
+let status02 = 0
 let enemy3statuses: number[] = []
-let status21 = 0
+let status01 = 0
 let enemy2statuses: number[] = []
-let status20 = 0
-let status10 = 0
 let status00 = 0
 let enemy1statuses: number[] = []
 let what_move_player_is_doing = 0
+let status22 = 0
+let status21 = 0
+let status20 = 0
 let move_set_open = false
 let move_being_made = false
 let enemymove = false
