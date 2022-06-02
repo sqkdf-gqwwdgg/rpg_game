@@ -57,6 +57,41 @@ sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.Enemy, funct
     sprite.destroy()
     crits.value += 2
 })
+function set_enemy_statuses () {
+    let status32 = 0
+    let status12 = 0
+    let status02 = 0
+    let status31 = 0
+    let status11 = 0
+    let status01 = 0
+    let status30 = 0
+    enemy1statuses = [
+    status00,
+    status10,
+    status20,
+    status30
+    ]
+    enemy2statuses = [
+    status01,
+    status11,
+    status21,
+    status31
+    ]
+    enemy3statuses = [
+    status02,
+    status12,
+    status22,
+    status32
+    ]
+    // fire 1st enemy status
+    // just does damage over time
+    // deaf 2nd status 
+    // just disallows attack
+    // marked for death 3rd status just increases damage done to enemy
+    // weakened 4th enemy status
+    // does less damage
+    literally_just_for_me_to_keep_track_of_statuses = 0
+}
 function declaremovesets () {
     healermoves = [
     sprites.create(img`
@@ -333,6 +368,12 @@ function domove (num: number) {
     if (num == 2) {
         move_being_made = true
     }
+    if (num == 4) {
+        move_being_made = true
+    }
+    if (num == 5) {
+        move_being_made = true
+    }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     if (enemymove) {
@@ -379,6 +420,26 @@ function enemyspawning () {
     statusbar3.max = enemyspecs[1]
     statusbar3.value = enemyspecs[2]
     statusbar3.attachToSprite(enemy3)
+}
+function effects2 () {
+    if (enemy1statuses[0] > 0) {
+        enemy1.startEffect(effects.fire, 1000)
+    }
+    if (enemy2statuses[0] > 0) {
+        enemy2.startEffect(effects.fire, 1000)
+    }
+    if (enemy3statuses[0] > 0) {
+        enemy3.startEffect(effects.fire, 1000)
+    }
+    if (enemy1statuses[2] > 0) {
+        enemy1.startEffect(effects.trail, 1000)
+    }
+    if (enemy2statuses[2] > 0) {
+        enemy2.startEffect(effects.trail, 1000)
+    }
+    if (enemy3statuses[2] > 0) {
+        enemy3.startEffect(effects.trail, 1000)
+    }
 }
 function advanceroom () {
     scroller.scrollBackgroundWithSpeed(50, 0)
@@ -574,29 +635,13 @@ function advanceroom () {
     }
 }
 function attack4 (num: number) {
-    if (num == 4) {
+    if (num == 5) {
+        damage_enemy(-75, -125)
         if (list2[place] == enemy1) {
-            if (status20 > 0) {
-                statusbar.value += -125
-            } else {
-                statusbar.value += -75
-            }
             status00 += 2
-        }
-        if (list2[place] == enemy2) {
-            if (status21 > 0) {
-                statusbar2.value += -125
-            } else {
-                statusbar2.value += -75
-            }
+        } else if (list2[place] == enemy2) {
             status10 += 2
-        }
-        if (list2[place] == enemy3) {
-            if (status22 > 0) {
-                statusbar3.value += -125
-            } else {
-                statusbar3.value += -75
-            }
+        } else {
             status20 += 2
         }
     }
@@ -615,13 +660,6 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function declare_storage () {
-    let status32 = 0
-    let status12 = 0
-    let status02 = 0
-    let status31 = 0
-    let status11 = 0
-    let status01 = 0
-    let status30 = 0
     enemykind1 = [
     img`
         f f f . . . . . . . . f f f . . 
@@ -972,32 +1010,6 @@ function declare_storage () {
     kaijumoves = [0, 1]
     snakemoves = [0, 1]
     ghostmoves = [0, 1]
-    enemy1statuses = [
-    status00,
-    status10,
-    status20,
-    status30
-    ]
-    enemy2statuses = [
-    status01,
-    status11,
-    status21,
-    status31
-    ]
-    enemy3statuses = [
-    status02,
-    status12,
-    status22,
-    status32
-    ]
-    // fire 1st enemy status
-    // just does damage over time
-    // deaf 2nd status 
-    // just disallows attack
-    // marked for death 3rd status just increases damage done to enemy
-    // weakened 4th enemy status
-    // does less damage
-    literally_just_for_me_to_keep_track_of_statuses = 0
 }
 sprites.onCreated(SpriteKind.warrior, function (sprite) {
     warriorhealth = statusbars.create(20, 2, StatusBarKind.Health)
@@ -1031,6 +1043,7 @@ function who_got_hit (num: number) {
         crits.value += 3
     }
     attack4(num)
+    enemymoves()
 }
 statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
     enemy3.setImage(enemykind3[randint(0, 2)])
@@ -1080,7 +1093,6 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
         status22 += 3
         for (let index = 0; index < 9; index++) {
             pause(200)
-            flowerdmgincrease += 0.5
             flowerthingy = sprites.create(img`
                 . . . . . . . . 
                 . . . . . . . . 
@@ -1113,7 +1125,29 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
     }
     if (num == 4) {
         tracker.setPosition(list2[place].x, list2[place].y)
-        flowerthingy = sprites.create(img`
+        boom = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 3 1 3 . . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . 2 1 1 1 2 . . . . . 
+            . . . . . . 2 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . . 2 2 2 . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.from_the_ground)
+        boom.setPosition(list2[place].x, list2[place].y)
+    }
+    if (num == 5) {
+        tracker.setPosition(list2[place].x, list2[place].y)
+        otherprojectile = sprites.create(img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
@@ -1131,8 +1165,8 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.player_to_enemy_projectile)
-        flowerthingy.follow(sprite)
-        flowerthingy.setPosition(100, 60)
+        otherprojectile.follow(sprite)
+        otherprojectile.setPosition(100, 60)
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -1399,6 +1433,110 @@ function figure_out_what_move_player_is_doing () {
     }
     placement2 = 3
 }
+function beegboom (Sprite2: Sprite, Sprite1: Sprite) {
+    if (what_move_player_is_doing == 4) {
+        animation.runImageAnimation(
+        Sprite2,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 3 1 3 . . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . 2 1 1 1 2 . . . . . 
+            . . . . . . 2 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . . 2 2 2 . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . 2 3 3 3 3 3 2 . . . . 
+            . . . . 3 1 1 1 1 1 1 1 3 . . . 
+            . . . . 1 1 1 1 1 1 1 1 1 . . . 
+            . . . 2 1 1 1 1 1 1 1 1 1 2 . . 
+            . . . 2 3 1 1 1 1 1 1 3 3 2 . . 
+            . . . . . . 2 2 2 2 2 . . . . . 
+            `,img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . 4 4 4 4 4 . . . . . . 
+            . . . 4 4 4 5 5 5 d 4 4 4 4 . . 
+            . . 4 d 5 d 5 5 5 d d d 4 4 . . 
+            . . 4 5 5 1 1 1 d d 5 5 5 4 . . 
+            . 4 5 5 5 1 1 1 5 1 1 5 5 4 4 . 
+            . 4 d d 1 1 5 5 5 1 1 5 5 d 4 . 
+            . 4 5 5 1 1 5 1 1 5 5 d d d 4 . 
+            . 2 5 5 5 d 1 1 1 5 1 1 5 5 2 . 
+            . 2 d 5 5 d 1 1 1 5 1 1 5 5 2 . 
+            . . 2 4 d d 5 5 5 5 d d 5 4 . . 
+            . . . 2 2 4 d 5 5 d d 4 4 . . . 
+            . . 2 2 2 2 2 4 4 4 2 2 2 . . . 
+            . . . 2 2 4 4 4 4 4 4 2 2 . . . 
+            . . . . . 2 2 2 2 2 2 . . . . . 
+            `,img`
+            . . . . 2 2 2 2 2 2 2 2 . . . . 
+            . . . 2 4 4 4 5 5 4 4 4 2 2 2 . 
+            . 2 2 5 5 d 4 5 5 5 4 4 4 4 2 . 
+            . 2 4 5 5 5 5 d 5 5 5 4 5 4 2 2 
+            . 2 4 d d 5 5 5 5 5 5 d 4 4 4 2 
+            2 4 5 5 d 5 5 5 d d d 5 5 5 4 4 
+            2 4 5 5 4 4 4 d 5 5 d 5 5 5 4 4 
+            4 4 4 4 . . 2 4 5 5 . . 4 4 4 4 
+            . . b b b b 2 4 4 2 b b b b . . 
+            . b d d d d 2 4 4 2 d d d d b . 
+            b d d b b b 2 4 4 2 b b b d d b 
+            b d d b b b b b b b b b b d d b 
+            b b d 1 1 3 1 1 d 1 d 1 1 d b b 
+            . . b b d d 1 1 3 d d 1 b b . . 
+            . . 2 2 4 4 4 4 4 4 4 4 2 2 . . 
+            . . . 2 2 4 4 4 4 4 2 2 2 . . . 
+            `,img`
+            . . . . . . . . b b . . . . . . 
+            . . . . . . . . b b . . . . . . 
+            . . . b b b . . . . . . . . . . 
+            . . b d d b . . . . . . . b b . 
+            . b d d d b . . . . . . b d d b 
+            . b d d b . . . . b b . b d d b 
+            . b b b . . . . . b b . . b b . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . b b b d d d d d d b b b . . 
+            . b d c c c b b b b c c d d b . 
+            b d d c b . . . . . b c c d d b 
+            c d d b b . . . . . . b c d d c 
+            c b d d d b b . . . . b d d c c 
+            . c c b d d d d b . c c c c c c 
+            . . . c c c c c c . . . . . . . 
+            `],
+        50,
+        false
+        )
+        if (Sprite1 == statusbar2.spriteAttachedTo()) {
+            if (status21 > 0) {
+                statusbar2.value += -150
+            } else {
+                statusbar2.value += -125
+            }
+            statusbar.value += -25
+            statusbar3.value += -25
+        }
+    }
+}
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     if (move_being_made) {
         if (place == list2.length - 1) {
@@ -1447,12 +1585,9 @@ sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite
         }
         sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
         pause(500)
-        sprite.startEffect(effects.fire, 500)
         sprite.destroy()
     }
-    if (what_move_player_is_doing == 4) {
-    	
-    }
+    turn_ended()
 })
 sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth = statusbars.create(20, 2, StatusBarKind.Health)
@@ -1489,7 +1624,31 @@ function enemymoves () {
 function do_enemy_attack () {
     which_enemy_attacking = list[randint(0, 2)]
 }
+function damage_enemy (normalnum: number, critnum: number) {
+    if (list2[place] == enemy1) {
+        if (status20 > 0) {
+            statusbar.value += critnum
+        } else {
+            statusbar.value += normalnum
+        }
+    }
+    if (list2[place] == enemy2) {
+        if (status21 > 0) {
+            statusbar2.value += critnum
+        } else {
+            statusbar3.value += normalnum
+        }
+    }
+    if (list2[place] == enemy3) {
+        if (status22 > 0) {
+            statusbar3.value += critnum
+        } else {
+            statusbar3.value += normalnum
+        }
+    }
+}
 function turn_ended () {
+    set_enemy_statuses()
     if (enemy1statuses[0] > 0) {
         statusbar.value += -25
     }
@@ -1500,17 +1659,17 @@ function turn_ended () {
         statusbar3.value += -25
     }
     for (let value of enemy1statuses) {
-        if (!(value == 0)) {
+        if (value < 0) {
             value += -1
         }
     }
     for (let value of enemy1statuses) {
-        if (!(value == 0)) {
+        if (value < 0) {
             value += -1
         }
     }
     for (let value of enemy1statuses) {
-        if (!(value == 0)) {
+        if (value < 0) {
             value += -1
         }
     }
@@ -1518,29 +1677,31 @@ function turn_ended () {
 let which_enemy_attacking: Sprite = null
 let counter = 0
 let list_of_images: Image[] = []
+let otherprojectile: Sprite = null
+let boom: Sprite = null
 let randomnum = 0
 let flowerthingy: Sprite = null
 let healerhealth: StatusBarSprite = null
 let magehealth: StatusBarSprite = null
 let warriorhealth: StatusBarSprite = null
-let literally_just_for_me_to_keep_track_of_statuses = 0
-let enemy3statuses: number[] = []
-let enemy2statuses: number[] = []
-let enemy1statuses: number[] = []
 let ghostmoves: number[] = []
 let snakemoves: number[] = []
 let kaijumoves: number[] = []
 let batmoves: number[] = []
-let status22 = 0
-let status10 = 0
-let status21 = 0
-let status00 = 0
-let status20 = 0
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
 let placeholder1: Image[] = []
 let placeholdersprite: Sprite = null
 let moveimagecopy: Image = null
+let literally_just_for_me_to_keep_track_of_statuses = 0
+let status22 = 0
+let enemy3statuses: number[] = []
+let status21 = 0
+let enemy2statuses: number[] = []
+let status20 = 0
+let status10 = 0
+let status00 = 0
+let enemy1statuses: number[] = []
 let what_move_player_is_doing = 0
 let move_set_open = false
 let move_being_made = false
@@ -1733,3 +1894,7 @@ crits = statusbars.create(60, 4, StatusBarKind.Magic)
 crits.value = 0
 crits.max = 250
 crits.setPosition(75, 4)
+forever(function () {
+    pause(1000)
+    effects2()
+})
