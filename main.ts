@@ -13,6 +13,7 @@ namespace SpriteKind {
     export const player_to_enemy_projectile = SpriteKind.create()
     export const bob = SpriteKind.create()
     export const from_the_ground = SpriteKind.create()
+    export const meaniehead = SpriteKind.create()
 }
 namespace StatusBarKind {
     export const enemyhealth2 = StatusBarKind.create()
@@ -458,6 +459,9 @@ function effects2 () {
         enemy3.startEffect(effects.trail, 1000)
     }
 }
+function damageplayer (mySprite: Sprite, num: number) {
+	
+}
 function advanceroom () {
     scroller.scrollBackgroundWithSpeed(50, 0)
     if (room_empty) {
@@ -649,6 +653,29 @@ function advanceroom () {
         100,
         true
         )
+    }
+}
+function dobatmove (num: number, target: number, spritses: Sprite) {
+    if (num == 0) {
+        enemy_to_player_projectile = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . b b . b b b . . . . . 
+            . . . . b 1 1 b 1 1 1 b . . . . 
+            . . b b 3 1 1 d d 1 d d b b . . 
+            . b 1 1 d d b b b b b 1 1 b . . 
+            . b 1 1 1 b . . . . . b d d b . 
+            . . 3 d d b . . . . . b d 1 1 b 
+            . b 1 d 3 . . . . . . . b 1 1 b 
+            . b 1 1 b . . . . . . b b 1 d b 
+            . b 1 d b . . . . . . b d 3 d b 
+            . b b d d b . . . . b d d d b . 
+            . b d d d d b . b b 3 d d 3 b . 
+            . . b d d 3 3 b d 3 3 b b b . . 
+            . . . b b b d d d d d b . . . . 
+            . . . . . . b b b b b . . . . . 
+            `, SpriteKind.meaniehead)
+        enemy_to_player_projectile.setPosition(spritses.x, spritses.y)
     }
 }
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -1228,8 +1255,33 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
         otherprojectile.setPosition(100, 80)
     }
 }
-function enemycheckingmove (mySprite: Sprite, num: number) {
-	
+function enemycheckingmove (spritese: Sprite, num: number) {
+    if (spritese.image == img`
+        f f f . . . . . . . . f f f . . 
+        c b b c f . . . . . . c c f f . 
+        . c b b c f . . . . . . c c f f 
+        . c c c b f . . . . . . c f c f 
+        . c c b b c f . c c . c c f f f 
+        . c b b c b f c c 3 c c 3 c f f 
+        . c b c c b f c b 3 c b 3 b f f 
+        . . c c c b b c b b b b b b c . 
+        . . . c c c c b b 1 b b b 1 c . 
+        . . . . c c b b b b b b b b b c 
+        . . . . f b b b b c b b b c b c 
+        . . . c f b b b b 1 f f f 1 b f 
+        . . c c f b b b b b b b b b b f 
+        . . . . f c b b b b b b b b f . 
+        . . . . . f c b b b b b b f . . 
+        . . . . . . f f f f f f f . . . 
+        `) {
+        dobatmove(num, enemytargeting, spritese)
+    }
+    if (true) {
+    	
+    }
+    if (true) {
+    	
+    }
 }
 function respawn_enemies () {
     if (statusbar.value <= 0) {
@@ -1674,8 +1726,15 @@ function sethealth (sprite: Sprite) {
 function enemymoves () {
     enemymove = true
     which_enemy_doing_move = randint(0, 3)
-    enemytarget = randint(0, 3)
+    enemytargeting = randint(0, 3)
     roll_for_move = randint(0, 3)
+    if (enemytargeting == 0) {
+        enemytargeting = healer.y
+    } else if (enemytargeting == 1) {
+        enemytargeting = mage.y
+    } else if (enemytargeting == 2) {
+        enemytargeting = warrior.y
+    }
     if (which_enemy_doing_move == 0) {
         enemycheckingmove(enemy1, roll_for_move)
     } else if (which_enemy_doing_move == 1) {
@@ -1743,10 +1802,10 @@ function turn_ended () {
 }
 let which_enemy_attacking: Sprite = null
 let roll_for_move = 0
-let enemytarget = 0
 let which_enemy_doing_move = 0
 let counter = 0
 let list_of_images: Image[] = []
+let enemytargeting = 0
 let otherprojectile: Sprite = null
 let boom: Sprite = null
 let randomnum = 0
@@ -1758,6 +1817,7 @@ let ghostmoves: number[] = []
 let snakemoves: number[] = []
 let kaijumoves: number[] = []
 let batmoves: number[] = []
+let enemy_to_player_projectile: Sprite = null
 let enemyspecs: number[] = []
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
