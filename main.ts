@@ -73,11 +73,8 @@ sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.Enemy, funct
     crits.value += 2
 })
 function set_enemy_statuses () {
-    let status32 = 0
     let status12 = 0
-    let status31 = 0
     let status11 = 0
-    let status30 = 0
     let status10 = 0
     enemy1statuses = [
     status00,
@@ -386,6 +383,12 @@ function domove (num: number) {
         move_being_made = true
     }
     if (num == 5) {
+        move_being_made = true
+    }
+    if (num == 6) {
+        move_being_made = true
+    }
+    if (num == 9) {
         move_being_made = true
     }
 }
@@ -1034,6 +1037,26 @@ function who_got_hit (num: number) {
             status02 += 2
         }
     }
+    if (num == 6) {
+        damage_enemy(-15, -25)
+        if (list2[place] == enemy1) {
+            status20 += 2
+        } else if (list2[place] == enemy2) {
+            status21 += 2
+        } else {
+            status22 += 2
+        }
+    }
+    if (num == 9) {
+        damage_enemy(-35, -45)
+        if (list2[place] == enemy1) {
+            status30 += 2
+        } else if (list2[place] == enemy2) {
+            status31 += 2
+        } else {
+            status32 += 2
+        }
+    }
     enemymoves()
 }
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
@@ -1155,6 +1178,58 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
         otherprojectile.follow(sprite)
         otherprojectile.setPosition(100, 60)
     }
+    if (num == 6) {
+        tracker.setPosition(list2[place].x, list2[place].y)
+        for (let index = 0; index < 4; index++) {
+            pause(100)
+            otherprojectile = sprites.create(img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . b b . b b b . . . . . 
+                . . . . b 1 1 b 1 1 1 b . . . . 
+                . . b b 3 1 1 d d 1 d d b b . . 
+                . b 1 1 d d b b b b b 1 1 b . . 
+                . b 1 1 1 b . . . . . b d d b . 
+                . . 3 d d b . . . . . b d 1 1 b 
+                . b 1 d 3 . . . . . . . b 1 1 b 
+                . b 1 1 b . . . . . . b b 1 d b 
+                . b 1 d b . . . . . . b d 3 d b 
+                . b b d d b . . . . b d d d b . 
+                . b d d d d b . b b 3 d d 3 b . 
+                . . b d d 3 3 b d 3 3 b b b . . 
+                . . . b b b d d d d d b . . . . 
+                . . . . . . b b b b b . . . . . 
+                `, SpriteKind.player_to_enemy_projectile)
+            otherprojectile.follow(sprite)
+            otherprojectile.setPosition(100, 60)
+        }
+    }
+    if (num == 9) {
+        tracker.setPosition(list2[place].x, list2[place].y)
+        otherprojectile = sprites.create(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . b . . . . . . . 
+            . . . . . . . b d b . . . . . . 
+            . . . . . . . c d c . . . . . . 
+            . . . . . . . c 5 c . . . . . . 
+            . . . . . . c d 5 d c . . . . . 
+            . . . b c c d 5 5 5 d c c b . . 
+            . . b d d 5 5 5 5 5 5 5 d d b . 
+            . . . b c c d 5 5 5 d c c b . . 
+            . . . . . . c d 5 d c . . . . . 
+            . . . . . . . c 5 c . . . . . . 
+            . . . . . . . c d c . . . . . . 
+            . . . . . . . b d b . . . . . . 
+            . . . . . . . . b . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, SpriteKind.player_to_enemy_projectile)
+        otherprojectile.follow(sprite)
+        otherprojectile.setPosition(100, 80)
+    }
+}
+function enemycheckingmove (mySprite: Sprite, num: number) {
+	
 }
 function respawn_enemies () {
     if (statusbar.value <= 0) {
@@ -1598,7 +1673,16 @@ function sethealth (sprite: Sprite) {
 }
 function enemymoves () {
     enemymove = true
-    enemy1.sayText("enemies currently cant attack, so this is a placeholder", 2000, false)
+    which_enemy_doing_move = randint(0, 3)
+    enemytarget = randint(0, 3)
+    roll_for_move = randint(0, 3)
+    if (which_enemy_doing_move == 0) {
+        enemycheckingmove(enemy1, roll_for_move)
+    } else if (which_enemy_doing_move == 1) {
+        enemycheckingmove(enemy2, roll_for_move)
+    } else if (which_enemy_doing_move == 2) {
+        enemycheckingmove(enemy3, roll_for_move)
+    }
     pause(2000)
     enemymove = false
     turn_ended()
@@ -1645,12 +1729,12 @@ function turn_ended () {
             value += -1
         }
     }
-    for (let value of enemy1statuses) {
+    for (let value of enemy2statuses) {
         if (value < 0) {
             value += -1
         }
     }
-    for (let value of enemy1statuses) {
+    for (let value of enemy3statuses) {
         if (value < 0) {
             value += -1
         }
@@ -1658,6 +1742,9 @@ function turn_ended () {
     respawn_enemies()
 }
 let which_enemy_attacking: Sprite = null
+let roll_for_move = 0
+let enemytarget = 0
+let which_enemy_doing_move = 0
 let counter = 0
 let list_of_images: Image[] = []
 let otherprojectile: Sprite = null
@@ -1679,10 +1766,13 @@ let placeholder1: Image[] = []
 let placeholdersprite: Sprite = null
 let moveimagecopy: Image = null
 let literally_just_for_me_to_keep_track_of_statuses = 0
+let status32 = 0
 let status02 = 0
 let enemy3statuses: number[] = []
+let status31 = 0
 let status01 = 0
 let enemy2statuses: number[] = []
+let status30 = 0
 let status00 = 0
 let enemy1statuses: number[] = []
 let what_move_player_is_doing = 0
@@ -1884,15 +1974,6 @@ forever(function () {
     info.player3.setScore(statusbar3.value)
 })
 forever(function () {
-	
-})
-forever(function () {
-	
-})
-forever(function () {
     pause(1000)
     effects2()
-})
-forever(function () {
-	
 })
