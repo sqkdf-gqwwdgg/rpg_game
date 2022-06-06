@@ -18,14 +18,6 @@ namespace StatusBarKind {
     export const enemyhealth2 = StatusBarKind.create()
     export const enemyhealth3 = StatusBarKind.create()
 }
-statusbars.onStatusReached(StatusBarKind.EnemyHealth, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
-    enemy1.setImage(enemykind1[randint(0, 2)])
-    sethealth(enemy1)
-    statusbar = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
-    statusbar.max = enemyspecs[1]
-    statusbar.value = enemyspecs[2]
-    statusbar.attachToSprite(enemy1)
-})
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     if (enemymove) {
     	
@@ -1044,20 +1036,13 @@ function who_got_hit (num: number) {
     }
     enemymoves()
 }
-statusbars.onStatusReached(StatusBarKind.enemyhealth3, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
-    enemy3.setImage(enemykind3[randint(0, 2)])
-    sethealth(enemy3)
-    statusbar3 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
-    statusbar3.max = enemyspecs[1]
-    statusbar3.value = enemyspecs[2]
-    statusbar3.attachToSprite(enemy3)
-})
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
     if (num == 0) {
         healer.startEffect(effects.hearts, 1000)
         warriorhealth.value += 30
         magehealth.value += 30
         healerhealth.value += 20
+        enemymoves()
     }
     if (num == 1) {
         tracker.setPosition(list2[place].x, list2[place].y)
@@ -1090,8 +1075,8 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
         status20 += 3
         status21 += 3
         status22 += 3
-        for (let index = 0; index < 9; index++) {
-            pause(200)
+        for (let index = 0; index < 36; index++) {
+            pause(100)
             flowerthingy = sprites.create(img`
                 . . . . . . . . 
                 . . . . . . . . 
@@ -1143,6 +1128,9 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
             . . . . . . . . . . . . . . . . 
             `, SpriteKind.from_the_ground)
         boom.setPosition(list2[place].x, list2[place].y)
+        status00 += 2
+        status01 += 2
+        status02 += 2
     }
     if (num == 5) {
         tracker.setPosition(list2[place].x, list2[place].y)
@@ -1166,6 +1154,32 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
             `, SpriteKind.player_to_enemy_projectile)
         otherprojectile.follow(sprite)
         otherprojectile.setPosition(100, 60)
+    }
+}
+function respawn_enemies () {
+    if (statusbar.value <= 0) {
+        enemy1.setImage(enemykind1[randint(0, 2)])
+        sethealth(enemy1)
+        statusbar = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+        statusbar.max = enemyspecs[1]
+        statusbar.value = enemyspecs[2]
+        statusbar.attachToSprite(enemy1)
+    }
+    if (statusbar2.value <= 0) {
+        enemy2.setImage(enemykind2[randint(0, 2)])
+        sethealth(enemy2)
+        statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+        statusbar2.max = enemyspecs[1]
+        statusbar2.value = enemyspecs[2]
+        statusbar2.attachToSprite(enemy2)
+    }
+    if (statusbar3.value <= 0) {
+        enemy3.setImage(enemykind3[randint(0, 2)])
+        sethealth(enemy3)
+        statusbar3 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
+        statusbar3.max = enemyspecs[1]
+        statusbar3.value = enemyspecs[2]
+        statusbar3.attachToSprite(enemy3)
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -1432,10 +1446,45 @@ function figure_out_what_move_player_is_doing () {
     }
     placement2 = 3
 }
-function beegboom (Sprite2: Sprite, Sprite1: Sprite) {
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (move_being_made) {
+        if (place == list2.length - 1) {
+            place = 0
+        } else {
+            place += 1
+        }
+        tracker.setPosition(list2[place].x, list2[place].y)
+    } else {
+        if (move_set_open) {
+            placement2 = 2
+            tracker.setPosition(list3[place][2].x, list3[place][2].y)
+        } else {
+            if (place == list.length - 1) {
+                place = 0
+            } else {
+                place += 1
+            }
+            tracker.setPosition(_import[place].x, _import[place].y)
+        }
+    }
+})
+sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite, otherSprite) {
+    if (what_move_player_is_doing == 2) {
+        crits.value += 1
+        damage_enemy2(-5, -10, otherSprite)
+        sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
+        pause(500)
+        sprite.destroy()
+    }
     if (what_move_player_is_doing == 4) {
+        crits.value += 20
+        damage_enemy2(-30, -80, otherSprite)
+        damage_enemy2(-20, -20, enemy1)
+        damage_enemy2(-20, -20, enemy2)
+        damage_enemy2(-20, -20, enemy3)
+        sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
         animation.runImageAnimation(
-        Sprite2,
+        sprite,
         [img`
             . . . . . . . . . . . . . . . . 
             . . . . . . . 2 1 2 . . . . . . 
@@ -1522,85 +1571,19 @@ function beegboom (Sprite2: Sprite, Sprite1: Sprite) {
             . c c b d d d d b . c c c c c c 
             . . . c c c c c c . . . . . . . 
             `],
-        50,
+        100,
         false
         )
-        if (Sprite1 == statusbar2.spriteAttachedTo()) {
-            if (status21 > 0) {
-                statusbar2.value += -150
-            } else {
-                statusbar2.value += -125
-            }
-            statusbar.value += -25
-            statusbar3.value += -25
-        }
-    }
-}
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (move_being_made) {
-        if (place == list2.length - 1) {
-            place = 0
-        } else {
-            place += 1
-        }
-        tracker.setPosition(list2[place].x, list2[place].y)
-    } else {
-        if (move_set_open) {
-            placement2 = 2
-            tracker.setPosition(list3[place][2].x, list3[place][2].y)
-        } else {
-            if (place == list.length - 1) {
-                place = 0
-            } else {
-                place += 1
-            }
-            tracker.setPosition(_import[place].x, _import[place].y)
-        }
-    }
-})
-sprites.onOverlap(SpriteKind.from_the_ground, SpriteKind.Enemy, function (sprite, otherSprite) {
-    if (what_move_player_is_doing == 2) {
-        crits.value += 1
-        if (otherSprite == statusbar.spriteAttachedTo()) {
-            if (status20 > 0) {
-                statusbar.value += -10
-            } else {
-                statusbar.value += -5
-            }
-        }
-        if (otherSprite == statusbar2.spriteAttachedTo()) {
-            if (status21 > 0) {
-                statusbar2.value += -10
-            } else {
-                statusbar2.value += -5
-            }
-        }
-        if (otherSprite == statusbar3.spriteAttachedTo()) {
-            if (status22 > 0) {
-                statusbar3.value += -10
-            } else {
-                statusbar3.value += -10
-            }
-        }
-        sprite.setFlag(SpriteFlag.GhostThroughSprites, true)
         pause(500)
         sprite.destroy()
     }
-    turn_ended()
+    enemymoves()
 })
 sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth = statusbars.create(20, 2, StatusBarKind.Health)
     magehealth.max = 80
     magehealth.value = 80
     magehealth.attachToSprite(sprite)
-})
-statusbars.onStatusReached(StatusBarKind.enemyhealth2, statusbars.StatusComparison.LTE, statusbars.ComparisonType.Fixed, 0, function (status) {
-    enemy2.setImage(enemykind2[randint(0, 2)])
-    sethealth(enemy2)
-    statusbar2 = statusbars.create(enemyspecs[0], 2, StatusBarKind.EnemyHealth)
-    statusbar2.max = enemyspecs[1]
-    statusbar2.value = enemyspecs[2]
-    statusbar2.attachToSprite(enemy2)
 })
 function sethealth (sprite: Sprite) {
     if (sprite.image == enemykind1[0]) {
@@ -1648,13 +1631,13 @@ function damage_enemy (normalnum: number, critnum: number) {
 }
 function turn_ended () {
     set_enemy_statuses()
-    if (enemy1statuses[0] > 0) {
+    if (status00 > 0) {
         statusbar.value += -25
     }
-    if (enemy2statuses[0] > 0) {
+    if (status01 > 0) {
         statusbar2.value += -25
     }
-    if (enemy3statuses[0] > 0) {
+    if (status02 > 0) {
         statusbar3.value += -25
     }
     for (let value of enemy1statuses) {
@@ -1672,6 +1655,7 @@ function turn_ended () {
             value += -1
         }
     }
+    respawn_enemies()
 }
 let which_enemy_attacking: Sprite = null
 let counter = 0
@@ -1687,8 +1671,10 @@ let ghostmoves: number[] = []
 let snakemoves: number[] = []
 let kaijumoves: number[] = []
 let batmoves: number[] = []
+let enemyspecs: number[] = []
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
+let enemykind1: Image[] = []
 let placeholder1: Image[] = []
 let placeholdersprite: Sprite = null
 let moveimagecopy: Image = null
@@ -1706,8 +1692,6 @@ let status20 = 0
 let move_set_open = false
 let move_being_made = false
 let enemymove = false
-let enemyspecs: number[] = []
-let enemykind1: Image[] = []
 let crits: StatusBarSprite = null
 let statusbar2: StatusBarSprite = null
 let statusbar3: StatusBarSprite = null
@@ -1895,6 +1879,20 @@ crits.value = 0
 crits.max = 250
 crits.setPosition(75, 4)
 forever(function () {
+    info.setScore(statusbar.value)
+    info.player2.setScore(statusbar2.value)
+    info.player3.setScore(statusbar3.value)
+})
+forever(function () {
+	
+})
+forever(function () {
+	
+})
+forever(function () {
     pause(1000)
     effects2()
+})
+forever(function () {
+	
 })
