@@ -439,6 +439,9 @@ function enemyspawning () {
     statusbar3.value = enemyspecs[2]
     statusbar3.attachToSprite(enemy3)
 }
+controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
+    enemycheckingmove(enemy1, 0)
+})
 function effects2 () {
     if (enemy1statuses[0] > 0) {
         enemy1.startEffect(effects.fire, 1000)
@@ -459,8 +462,14 @@ function effects2 () {
         enemy3.startEffect(effects.trail, 1000)
     }
 }
-function damageplayer (mySprite: Sprite, num: number) {
-	
+function damageplayer (num: number) {
+    if (enemytargeting == 0) {
+        healerhealth.value += num
+    } else if (enemytargeting == 1) {
+        magehealth.value += num
+    } else if (enemytargeting == 2) {
+        warriorhealth.value += num
+    }
 }
 function advanceroom () {
     scroller.scrollBackgroundWithSpeed(50, 0)
@@ -655,7 +664,8 @@ function advanceroom () {
         )
     }
 }
-function dobatmove (num: number, target: number, spritses: Sprite) {
+function dobatmove (num: number, spritses: Sprite) {
+    enemytargeting = randint(0, 2)
     if (num == 0) {
         enemy_to_player_projectile = sprites.create(img`
             . . . . . . . . . . . . . . . . 
@@ -676,6 +686,13 @@ function dobatmove (num: number, target: number, spritses: Sprite) {
             . . . . . . b b b b b . . . . . 
             `, SpriteKind.meaniehead)
         enemy_to_player_projectile.setPosition(spritses.x, spritses.y)
+    }
+    if (enemytargeting == 0) {
+        enemy_to_player_projectile.follow(healer)
+    } else if (enemytargeting == 1) {
+        enemy_to_player_projectile.follow(mage)
+    } else if (enemytargeting == 2) {
+        enemy_to_player_projectile.follow(warrior)
     }
 }
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -1086,6 +1103,9 @@ function who_got_hit (num: number) {
     }
     enemymoves()
 }
+sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.mage, function (sprite, otherSprite) {
+    damageplayer(-15)
+})
 function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number, sprite: Sprite) {
     if (num == 0) {
         healer.startEffect(effects.hearts, 1000)
@@ -1256,25 +1276,8 @@ function run_attack_code_for_whatever_the_hell_the_player_is_doing (num: number,
     }
 }
 function enemycheckingmove (spritese: Sprite, num: number) {
-    if (spritese.image == img`
-        f f f . . . . . . . . f f f . . 
-        c b b c f . . . . . . c c f f . 
-        . c b b c f . . . . . . c c f f 
-        . c c c b f . . . . . . c f c f 
-        . c c b b c f . c c . c c f f f 
-        . c b b c b f c c 3 c c 3 c f f 
-        . c b c c b f c b 3 c b 3 b f f 
-        . . c c c b b c b b b b b b c . 
-        . . . c c c c b b 1 b b b 1 c . 
-        . . . . c c b b b b b b b b b c 
-        . . . . f b b b b c b b b c b c 
-        . . . c f b b b b 1 f f f 1 b f 
-        . . c c f b b b b b b b b b b f 
-        . . . . f c b b b b b b b b f . 
-        . . . . . f c b b b b b b f . . 
-        . . . . . . f f f f f f f . . . 
-        `) {
-        dobatmove(num, enemytargeting, spritese)
+    if (0 == 0) {
+        dobatmove(num, spritese)
     }
     if (true) {
     	
@@ -1283,6 +1286,9 @@ function enemycheckingmove (spritese: Sprite, num: number) {
     	
     }
 }
+sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.warrior, function (sprite, otherSprite) {
+    damageplayer(-15)
+})
 function respawn_enemies () {
     if (statusbar.value <= 0) {
         enemy1.setImage(enemykind1[randint(0, 2)])
@@ -1712,6 +1718,9 @@ sprites.onCreated(SpriteKind.mage, function (sprite) {
     magehealth.value = 80
     magehealth.attachToSprite(sprite)
 })
+sprites.onOverlap(SpriteKind.player_to_enemy_projectile, SpriteKind.healer, function (sprite, otherSprite) {
+    damageplayer(-15)
+})
 function sethealth (sprite: Sprite) {
     if (sprite.image == enemykind1[0]) {
         enemyspecs = [20, 225, 225]
@@ -1725,16 +1734,8 @@ function sethealth (sprite: Sprite) {
 }
 function enemymoves () {
     enemymove = true
-    which_enemy_doing_move = randint(0, 3)
-    enemytargeting = randint(0, 3)
-    roll_for_move = randint(0, 3)
-    if (enemytargeting == 0) {
-        enemytargeting = healer.y
-    } else if (enemytargeting == 1) {
-        enemytargeting = mage.y
-    } else if (enemytargeting == 2) {
-        enemytargeting = warrior.y
-    }
+    which_enemy_doing_move = randint(0, 2)
+    roll_for_move = randint(0, 0)
     if (which_enemy_doing_move == 0) {
         enemycheckingmove(enemy1, roll_for_move)
     } else if (which_enemy_doing_move == 1) {
@@ -1805,19 +1806,19 @@ let roll_for_move = 0
 let which_enemy_doing_move = 0
 let counter = 0
 let list_of_images: Image[] = []
-let enemytargeting = 0
 let otherprojectile: Sprite = null
 let boom: Sprite = null
 let randomnum = 0
 let flowerthingy: Sprite = null
-let healerhealth: StatusBarSprite = null
-let magehealth: StatusBarSprite = null
-let warriorhealth: StatusBarSprite = null
 let ghostmoves: number[] = []
 let snakemoves: number[] = []
 let kaijumoves: number[] = []
 let batmoves: number[] = []
 let enemy_to_player_projectile: Sprite = null
+let warriorhealth: StatusBarSprite = null
+let magehealth: StatusBarSprite = null
+let healerhealth: StatusBarSprite = null
+let enemytargeting = 0
 let enemyspecs: number[] = []
 let enemykind3: Image[] = []
 let enemykind2: Image[] = []
